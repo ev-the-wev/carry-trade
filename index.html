@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Japan Carry-Trade Risk Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Favicon as a simple emoji-based data URL -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ctext y='0.9em' x='0.15em' font-size='90'%3E¥%3C/text%3E%3C/svg%3E">
+
+  <!-- TradingView base script -->
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+
+  <style>
+    :root {
+      --bg: #f5f5f5;
+      --fg: #222;
+      --card-bg: #ffffff;
+      --header-bg: #111111;
+      --header-fg: #ffffff;
+      --accent: #4ea3ff;
+      --shadow: rgba(0, 0, 0, 0.08);
+      --border-subtle: rgba(0, 0, 0, 0.12);
+      --green: #1b7f3f;
+      --yellow: #b38b00;
+      --red: #b3261e;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f0f0f;
+      --fg: #e5e5e5;
+      --card-bg: #181818;
+      --header-bg: #000000;
+      --header-fg: #f5f5f5;
+      --accent: #7bb3ff;
+      --shadow: rgba(0, 0, 0, 0.6);
+      --border-subtle: rgba(255, 255, 255, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    header {
+      background: var(--header-bg);
+      color: var(--header-fg);
+      padding: 0.65rem 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem 1rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+      min-width: 0;
+    }
+
+    .site-title {
+      font-weight: 600;
+      font-size: 0.98rem;
+      white-space: nowrap;
+    }
+
+    #price {
+      font-size: 0.85rem;
+      opacity: 0.85;
+      white-space: nowrap;
+    }
+
+    nav.main-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      font-size: 0.82rem;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 1 1 auto;
+    }
+
+    nav.main-nav a {
+      color: var(--header-fg);
+      text-decoration: none;
+      opacity: 0.85;
+      padding-bottom: 1px;
+      border-bottom: 1px solid transparent;
+    }
+
+    nav.main-nav a:hover {
+      opacity: 1;
+      border-bottom-color: var(--accent);
+    }
+
+    button.toggle-theme {
+      background: none;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: var(--header-fg);
+      padding: 3px 10px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    button.toggle-theme:hover {
+      border-color: var(--accent);
+    }
+
+    main {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 1.25rem 0.75rem 4rem;
+    }
+
+    .overall-note {
+      margin: 0 0 1.25rem;
+      font-size: 0.9rem;
+      border-left: 3px solid var(--accent);
+      padding: 0.5rem 0.75rem;
+      background: rgba(0,0,0,0.02);
+    }
+
+    [data-theme="dark"] .overall-note {
+      background: rgba(255,255,255,0.03);
+    }
+
+    section {
+      background: var(--card-bg);
+      margin-bottom: 1rem;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px var(--shadow);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    details {
+      padding: 0.2rem 1rem 1rem;
+    }
+
+    summary {
+      cursor: pointer;
+      padding: 0.8rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      list-style: none;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .summary-left {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
+
+    .summary-title {
+      font-size: 1.02rem;
+      font-weight: 600;
+    }
+
+    .summary-sub {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    .chevron {
+      font-size: 0.85rem;
+      opacity: 0.75;
+      transition: transform 0.15s ease;
+    }
+
+    details[open] .chevron {
+      transform: rotate(90deg);
+    }
+
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.25rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.8rem;
+    }
+
+    .pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      white-space: nowrap;
+    }
+
+    .pill.green {
+      background: rgba(27, 127, 63, 0.12);
+      border-color: rgba(27, 127, 63, 0.4);
+      color: var(--green);
+    }
+
+    .pill.yellow {
+      background: rgba(179, 139, 0, 0.12);
+      border-color: rgba(179, 139, 0, 0.4);
+      color: var(--yellow);
+    }
+
+    .pill.red {
+      background: rgba(179, 38, 30, 0.12);
+      border-color: rgba(179, 38, 30, 0.4);
+      color: var(--red);
+    }
+
+    .guidance {
+      font-size: 0.82rem;
+      margin-bottom: 0.4rem;
+      opacity: 0.88;
+    }
+
+    .chart-container {
+      margin-top: 0.4rem;
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      text-align: center;
+      background: rgba(0,0,0,0.03);
+      backdrop-filter: blur(4px);
+      color: var(--fg);
+    }
+
+    [data-theme="dark"] footer {
+      background: rgba(0,0,0,0.6);
+      color: #ddd;
+    }
+
+    #timestamp {
+      opacity: 0.8;
+    }
+
+    .version {
+      opacity: 0.6;
+      margin-left: 0.75rem;
+    }
+
+    /* Mobile floating quick nav */
+    .mobile-nav {
+      position: fixed;
+      bottom: 2.1rem;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .mobile-nav-inner {
+      pointer-events: auto;
+      display: flex;
+      gap: 0.4rem;
+      padding: 0.35rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(10px);
+    }
+
+    .mobile-nav-inner a {
+      color: #f5f5f5;
+      font-size: 0.75rem;
+      text-decoration: none;
+      padding: 2px 7px;
+      border-radius: 999px;
+      opacity: 0.85;
+    }
+
+    .mobile-nav-inner a:hover {
+      opacity: 1;
+      background: rgba(255,255,255,0.1);
+    }
+
+    @media (min-width: 780px) {
+      .mobile-nav {
+        display: none;
+      }
+    }
+
+    @media (max-width: 640px) {
+      nav.main-nav {
+        display: none;
+      }
+      header {
+        align-items: flex-start;
+      }
+      .header-left {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-left">
+      <div class="site-title">Carry-Trade Dashboard</div>
+      <div id="price">(loading USD/JPY…)</div>
+    </div>
+
+    <nav class="main-nav">
+      <a href="#usdjpy">USD/JPY</a>
+      <a href="#jp10y">JGB 10Y</a>
+      <a href="#vix">VIX</a>
+      <a href="#dxy">DXY</a>
+      <a href="#hyg">HYG</a>
+      <a href="#arkk">ARKK</a>
+      <a href="#iwm">IWM</a>
+    </nav>
+
+    <button class="toggle-theme" type="button" onclick="toggleTheme()">Toggle theme</button>
+  </header>
+
+  <main>
+    <div class="overall-note">
+      Watch for clusters, not single blips: yen strength (USD/JPY down), JGB yields up, VIX higher,
+      and risk assets (HYG, ARKK, IWM) rolling over together.
+    </div>
+
+    <section id="usdjpy">
+      <details data-key="usdjpy" open>
+        <summary>
+          <div class="summary-left">
+            <div class="summary-title">USD/JPY &mdash; Yen Strength</div>
+            <div class="summary-sub">Carry-trade pressure grows as USD/JPY falls.</div>
+          </div>
+          <span class="chevron">▶</span>
+        </summary>
+        <div class="status-bar">
+          <span class="pill green">Green: &gt; 155, calm</span>
+          <span class="pill yellow">Yellow: 145&ndash;155, drifting lower</span>
+          <span class="pill red">Red: &lt; 145, fast drop</span>
+        </div>
+        <div class="guidance">
+          Big one-day moves (&gt; ~2%) matter more than tiny noise. Combine with JGB and VIX.
+        </div>
+        <div class="chart-container" id="tv_usdjpy"></div>
+      </details>
+    </section>
+
+    <section id="jp10y">
+      <details data-key="jp10y">
+        <summary>
+          <div class="summary-left">
+            <div class="summary-title">Japan 10Y (JGB 10Y)</div>
+            <div class="summary-sub">Market's view on BoJ tightening risk.</div>
+          </div>
+          <span class="chevron">▶</span>
+        </summary>
+        <div class="status-bar">
+          <span class="pill green">Green: ~0.6&ndash;0.8%</span>
+          <span class="pill yellow">Yellow: 0.8&ndash;1.0%</span>
+          <span class="pill red">Red: &gt; 1.0% or sharp spike</span>
+        </div>
+        <div class="guidance">
+          Sudden spikes are more important than the exact level. Especially if yen strengthens at the same time.
+        </div>
+        <div class="chart-container" id="tv_jp10y"></div>
+      </details>
+    </section>
+
+    <section id="vix">
+      <details data-key="vix">
+        <summary>
+          <div class="summary-left">
+            <div class="summary-title">VIX &mdash; Equity Volatility</div>
+            <div class="summary-sub">Fear gauge for US equities.</div>
+          </div>
+          <span class="chevron">▶</span>
+        </summary>
+        <div class="status-bar">
+          <span class="pill green">Green: &lt; 18</span>
+          <span class="pill yellow">Yellow: 18&ndash;25</span>
+          <span class="pill red">Red: &gt; 25 (panic often &gt; 35)</span>
+        </div>
+        <div class="guidance">
+          A rising VIX with stable fundamentals often means mechanical de-risking or hedging flows.
+        </div>
+        <div class="chart-container" id="tv_vix"></div>
+      </details>
+    </section>
+
+    <section id="dxy">
+      <details data-key="dxy">
+        <summary>
+          <div class="summary-left">
+            <div class="summary-title">DXY &mdash; US Dollar Index</div>
+            <div class="summary-sub">Stronger dollar often equals global stress.</div>
+          </div>
+          <span class="chevron">▶</span>
+        </summary>
+        <div class="status-bar">
+          <span class="pill green">Green: range-bound</span>
+          <span class="pill yellow">Yellow: +2&ndash;3% in a week</span>
+          <span class="pill red">Red: fast spike higher with EM weakness</span>
+        </div>
+        <div class="guidance">
+          DXY strength hits EM, commodities and dollar borrowers. Watch it with VIX and HYG.
+        </div>
+        <div class="chart-container" id="tv_dxy"></div>
+      </details>
+    </section>
+
+    <section id="hyg">
+      <details data-key="hyg">
+        <summary>
+          <div class="summary-left">
+            <div class="summary-title">HYG &mdash; High Yield Credit</div>
+            <div class="summary-sub">Junk bonds feel liquidity stress early.</div>
+          </div>
+          <span class="chevron">▶</span>
+        </summary>
+        <div class="status-bar">
+          <span class="pill green">Green: tracks S&amp;P</span>
+          <span class="pill yellow">Yellow: 2&ndash;3% drawdown vs S&amp;P</span>
+          <span class="pill red">Red: repeated sharp drops</span>
+        </div>
+        <div class="guidance">
+          When credit sells off harder than equities, the risk-off move is more serious.
+        </div>
+        <div class="chart-container" id="tv_hyg"></div>
+      </details>
+    </section>
+
+    <section id="arkk">
+      <details data-key="arkk">
+        <summary>
+          <div class="summary-left">
+            <div class="summary-title">ARKK &mdash; High Beta Growth</div>
+            <div class="summary-sub">Speculative, long-duration risk appetite.</div>
+          </div>
+          <span class="chevron">▶</span>
+        </summary>
+        <div class="status-bar">
+          <span class="pill green">Green: in line with indices</span>
+          <span class="pill yellow">Yellow: chronic underperformance</span>
+          <span class="pill red">Red: big drops while large caps hold</span>
+        </div>
+        <div class="guidance">
+          ARKK is a good proxy for how aggressive risk capital is feeling.
+        </div>
+        <div class="chart-container" id="tv_arkk"></div>
+      </details>
+    </section>
+
+    <section id="iwm">
+      <details data-key="iwm">
+        <summary>
+          <div class="summary-left">
+            <div class="summary-title">IWM &mdash; US Small Caps</div>
+            <div class="summary-sub">More sensitive to growth and financing costs.</div>
+          </div>
+          <span class="chevron">▶</span>
+        </summary>
+        <div class="status-bar">
+          <span class="pill green">Green: roughly tracks S&amp;P</span>
+          <span class="pill yellow">Yellow: clear lag over weeks</span>
+          <span class="pill red">Red: breaks down while large caps hold up</span>
+        </div>
+        <div class="guidance">
+          Weak small caps with strong mega-caps often means a narrow, fragile market.
+        </div>
+        <div class="chart-container" id="tv_iwm"></div>
+      </details>
+    </section>
+  </main>
+
+  <!-- Mobile quick nav -->
+  <div class="mobile-nav">
+    <div class="mobile-nav-inner">
+      <a href="#usdjpy">¥</a>
+      <a href="#jp10y">10Y</a>
+      <a href="#vix">VIX</a>
+      <a href="#dxy">$</a>
+      <a href="#hyg">HY</a>
+      <a href="#arkk">ARK</a>
+      <a href="#iwm">SC</a>
+    </div>
+  </div>
+
+  <footer>
+    <span id="timestamp"></span>
+    <span class="version">v0.3 &mdash; personal macro monitor</span>
+  </footer>
+
+  <script>
+    // THEME INITIALIZATION
+    (function initTheme() {
+      const saved = localStorage.getItem("ct_theme");
+      if (saved) {
+        document.body.dataset.theme = saved;
+      } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.body.dataset.theme = "dark";
+      } else {
+        document.body.dataset.theme = "light";
+      }
+    })();
+
+    function toggleTheme() {
+      const current = document.body.dataset.theme || "light";
+      const next = current === "light" ? "dark" : "light";
+      document.body.dataset.theme = next;
+      localStorage.setItem("ct_theme", next);
+      // TradingView widgets will stay in their initial theme,
+      // but page chrome updates without reload.
+    }
+
+    // KEYBOARD SHORTCUT: "t" to toggle theme
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "t" || e.key === "T") {
+        toggleTheme();
+      }
+    });
+
+    // TRADINGVIEW WIDGETS (auto-refresh from TradingView side)
+    function makeWidget(containerId, symbol) {
+      new TradingView.widget({
+        "container_id": containerId,
+        "symbol": symbol,
+        "width": "100%",
+        "height": 360,
+        "interval": "D",
+        "timezone": "Etc/UTC",
+        "theme": document.body.dataset.theme === "dark" ? "dark" : "light",
+        "style": "1",
+        "locale": "en",
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "withdateranges": true
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      makeWidget("tv_usdjpy", "FX_IDC:USDJPY");
+      makeWidget("tv_jp10y",  "TVC:JP10Y");
+      makeWidget("tv_vix",    "CBOE:VIX");
+      makeWidget("tv_dxy",    "TVC:DXY");
+      makeWidget("tv_hyg",    "AMEX:HYG");
+      makeWidget("tv_arkk",   "AMEX:ARKK");
+      makeWidget("tv_iwm",    "AMEX:IWM");
+
+      // PERSISTENT DETAILS OPEN/CLOSED STATE
+      document.querySelectorAll("details[data-key]").forEach((d) => {
+        const key = "ct_details_" + d.getAttribute("data-key");
+        const saved = localStorage.getItem(key);
+        if (saved === "open") d.setAttribute("open", "open");
+        if (saved === "closed") d.removeAttribute("open");
+        d.addEventListener("toggle", () => {
+          localStorage.setItem(key, d.open ? "open" : "closed");
+        });
+      });
+    });
+
+    // LIVE USD/JPY PRICE (approx, independent of TradingView stream)
+    async function updateJPY() {
+      const priceEl = document.getElementById("price");
+      try {
+        const res = await fetch("https://api.exchangerate.host/latest?base=USD&symbols=JPY");
+        const data = await res.json();
+        if (data && data.rates && data.rates.JPY) {
+          priceEl.textContent = "USD/JPY: " + data.rates.JPY.toFixed(2);
+        } else {
+          priceEl.textContent = "(no data)";
+        }
+      } catch (e) {
+        priceEl.textContent = "(error loading)";
+      }
+    }
+    updateJPY();
+    setInterval(updateJPY, 30000);
+
+    // TIMESTAMP WITH LOCAL TIMEZONE
+    (function setTimestamp() {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "local time";
+      const now = new Date();
+      const formatted = now.toLocaleString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+      document.getElementById("timestamp").textContent =
+        "Last refreshed: " + formatted + " (" + tz + ")";
+    })();
+  </script>
+</body>
+</html>
