@@ -8,9 +8,6 @@
   <!-- Favicon as a simple emoji-based data URL -->
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ctext y='0.9em' x='0.15em' font-size='90'%3E¥%3C/text%3E%3C/svg%3E">
 
-  <!-- TradingView base script -->
-  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-
   <style>
     :root {
       --bg: #f5f5f5;
@@ -265,7 +262,6 @@
       margin-left: 0.75rem;
     }
 
-    /* Mobile floating quick nav */
     .mobile-nav {
       position: fixed;
       bottom: 2.1rem;
@@ -347,27 +343,48 @@
       and risk assets (HYG, ARKK, IWM) rolling over together.
     </div>
 
+    <!-- USD/JPY -->
     <section id="usdjpy">
       <details data-key="usdjpy" open>
         <summary>
           <div class="summary-left">
-            <div class="summary-title">USD/JPY &mdash; Yen Strength</div>
+            <div class="summary-title">USD/JPY — Yen Strength</div>
             <div class="summary-sub">Carry-trade pressure grows as USD/JPY falls.</div>
           </div>
           <span class="chevron">▶</span>
         </summary>
         <div class="status-bar">
           <span class="pill green">Green: &gt; 155, calm</span>
-          <span class="pill yellow">Yellow: 145&ndash;155, drifting lower</span>
+          <span class="pill yellow">Yellow: 145–155, drifting lower</span>
           <span class="pill red">Red: &lt; 145, fast drop</span>
         </div>
         <div class="guidance">
           Big one-day moves (&gt; ~2%) matter more than tiny noise. Combine with JGB and VIX.
         </div>
-        <div class="chart-container" id="tv_usdjpy"></div>
+        <div class="chart-container">
+          <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+{
+  "width": "100%",
+  "height": 360,
+  "symbol": "FX:USDJPY",
+  "interval": "D",
+  "timezone": "Etc/UTC",
+  "theme": "dark",
+  "style": "1",
+  "locale": "en",
+  "allow_symbol_change": true,
+  "withdateranges": true,
+  "hide_side_toolbar": false
+}
+            </script>
+          </div>
+        </div>
       </details>
     </section>
 
+    <!-- Japan 10Y -->
     <section id="jp10y">
       <details data-key="jp10y">
         <summary>
@@ -378,85 +395,165 @@
           <span class="chevron">▶</span>
         </summary>
         <div class="status-bar">
-          <span class="pill green">Green: ~0.6&ndash;0.8%</span>
-          <span class="pill yellow">Yellow: 0.8&ndash;1.0%</span>
+          <span class="pill green">Green: ~0.6–0.8%</span>
+          <span class="pill yellow">Yellow: 0.8–1.0%</span>
           <span class="pill red">Red: &gt; 1.0% or sharp spike</span>
         </div>
         <div class="guidance">
           Sudden spikes are more important than the exact level. Especially if yen strengthens at the same time.
         </div>
-        <div class="chart-container" id="tv_jp10y"></div>
+        <div class="chart-container">
+          <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+{
+  "width": "100%",
+  "height": 360,
+  "symbol": "TVC:JP10Y",
+  "interval": "D",
+  "timezone": "Etc/UTC",
+  "theme": "dark",
+  "style": "1",
+  "locale": "en",
+  "allow_symbol_change": true,
+  "withdateranges": true,
+  "hide_side_toolbar": false
+}
+            </script>
+          </div>
+        </div>
       </details>
     </section>
 
+    <!-- VIX -->
     <section id="vix">
       <details data-key="vix">
         <summary>
           <div class="summary-left">
-            <div class="summary-title">VIX &mdash; Equity Volatility</div>
+            <div class="summary-title">VIX — Equity Volatility</div>
             <div class="summary-sub">Fear gauge for US equities.</div>
           </div>
           <span class="chevron">▶</span>
         </summary>
         <div class="status-bar">
           <span class="pill green">Green: &lt; 18</span>
-          <span class="pill yellow">Yellow: 18&ndash;25</span>
+          <span class="pill yellow">Yellow: 18–25</span>
           <span class="pill red">Red: &gt; 25 (panic often &gt; 35)</span>
         </div>
         <div class="guidance">
           A rising VIX with stable fundamentals often means mechanical de-risking or hedging flows.
         </div>
-        <div class="chart-container" id="tv_vix"></div>
+        <div class="chart-container">
+          <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+{
+  "width": "100%",
+  "height": 360,
+  "symbol": "CBOE:VIX",
+  "interval": "D",
+  "timezone": "Etc/UTC",
+  "theme": "dark",
+  "style": "1",
+  "locale": "en",
+  "allow_symbol_change": true,
+  "withdateranges": true,
+  "hide_side_toolbar": false
+}
+            </script>
+          </div>
+        </div>
       </details>
     </section>
 
+    <!-- DXY -->
     <section id="dxy">
       <details data-key="dxy">
         <summary>
           <div class="summary-left">
-            <div class="summary-title">DXY &mdash; US Dollar Index</div>
+            <div class="summary-title">DXY — US Dollar Index</div>
             <div class="summary-sub">Stronger dollar often equals global stress.</div>
           </div>
           <span class="chevron">▶</span>
         </summary>
         <div class="status-bar">
           <span class="pill green">Green: range-bound</span>
-          <span class="pill yellow">Yellow: +2&ndash;3% in a week</span>
+          <span class="pill yellow">Yellow: +2–3% in a week</span>
           <span class="pill red">Red: fast spike higher with EM weakness</span>
         </div>
         <div class="guidance">
           DXY strength hits EM, commodities and dollar borrowers. Watch it with VIX and HYG.
         </div>
-        <div class="chart-container" id="tv_dxy"></div>
+        <div class="chart-container">
+          <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+{
+  "width": "100%",
+  "height": 360,
+  "symbol": "TVC:DXY",
+  "interval": "D",
+  "timezone": "Etc/UTC",
+  "theme": "dark",
+  "style": "1",
+  "locale": "en",
+  "allow_symbol_change": true,
+  "withdateranges": true,
+  "hide_side_toolbar": false
+}
+            </script>
+          </div>
+        </div>
       </details>
     </section>
 
+    <!-- HYG -->
     <section id="hyg">
       <details data-key="hyg">
         <summary>
           <div class="summary-left">
-            <div class="summary-title">HYG &mdash; High Yield Credit</div>
+            <div class="summary-title">HYG — High Yield Credit</div>
             <div class="summary-sub">Junk bonds feel liquidity stress early.</div>
           </div>
           <span class="chevron">▶</span>
         </summary>
         <div class="status-bar">
-          <span class="pill green">Green: tracks S&amp;P</span>
-          <span class="pill yellow">Yellow: 2&ndash;3% drawdown vs S&amp;P</span>
+          <span class="pill green">Green: tracks S&P</span>
+          <span class="pill yellow">Yellow: 2–3% drawdown vs S&P</span>
           <span class="pill red">Red: repeated sharp drops</span>
         </div>
         <div class="guidance">
           When credit sells off harder than equities, the risk-off move is more serious.
         </div>
-        <div class="chart-container" id="tv_hyg"></div>
+        <div class="chart-container">
+          <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+{
+  "width": "100%",
+  "height": 360,
+  "symbol": "AMEX:HYG",
+  "interval": "D",
+  "timezone": "Etc/UTC",
+  "theme": "dark",
+  "style": "1",
+  "locale": "en",
+  "allow_symbol_change": true,
+  "withdateranges": true,
+  "hide_side_toolbar": false
+}
+            </script>
+          </div>
+        </div>
       </details>
     </section>
 
+    <!-- ARKK -->
     <section id="arkk">
       <details data-key="arkk">
         <summary>
           <div class="summary-left">
-            <div class="summary-title">ARKK &mdash; High Beta Growth</div>
+            <div class="summary-title">ARKK — High Beta Growth</div>
             <div class="summary-sub">Speculative, long-duration risk appetite.</div>
           </div>
           <span class="chevron">▶</span>
@@ -469,33 +566,71 @@
         <div class="guidance">
           ARKK is a good proxy for how aggressive risk capital is feeling.
         </div>
-        <div class="chart-container" id="tv_arkk"></div>
+        <div class="chart-container">
+          <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+{
+  "width": "100%",
+  "height": 360,
+  "symbol": "AMEX:ARKK",
+  "interval": "D",
+  "timezone": "Etc/UTC",
+  "theme": "dark",
+  "style": "1",
+  "locale": "en",
+  "allow_symbol_change": true,
+  "withdateranges": true,
+  "hide_side_toolbar": false
+}
+            </script>
+          </div>
+        </div>
       </details>
     </section>
 
+    <!-- IWM -->
     <section id="iwm">
       <details data-key="iwm">
         <summary>
           <div class="summary-left">
-            <div class="summary-title">IWM &mdash; US Small Caps</div>
+            <div class="summary-title">IWM — US Small Caps</div>
             <div class="summary-sub">More sensitive to growth and financing costs.</div>
           </div>
           <span class="chevron">▶</span>
         </summary>
         <div class="status-bar">
-          <span class="pill green">Green: roughly tracks S&amp;P</span>
+          <span class="pill green">Green: roughly tracks S&P</span>
           <span class="pill yellow">Yellow: clear lag over weeks</span>
           <span class="pill red">Red: breaks down while large caps hold up</span>
         </div>
         <div class="guidance">
           Weak small caps with strong mega-caps often means a narrow, fragile market.
         </div>
-        <div class="chart-container" id="tv_iwm"></div>
+        <div class="chart-container">
+          <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+{
+  "width": "100%",
+  "height": 360,
+  "symbol": "AMEX:IWM",
+  "interval": "D",
+  "timezone": "Etc/UTC",
+  "theme": "dark",
+  "style": "1",
+  "locale": "en",
+  "allow_symbol_change": true,
+  "withdateranges": true,
+  "hide_side_toolbar": false
+}
+            </script>
+          </div>
+        </div>
       </details>
     </section>
   </main>
 
-  <!-- Mobile quick nav -->
   <div class="mobile-nav">
     <div class="mobile-nav-inner">
       <a href="#usdjpy">¥</a>
@@ -510,11 +645,11 @@
 
   <footer>
     <span id="timestamp"></span>
-    <span class="version">v0.3 &mdash; personal macro monitor</span>
+    <span class="version">v0.4 — personal macro monitor</span>
   </footer>
 
   <script>
-    // THEME INITIALIZATION
+    // Theme init
     (function initTheme() {
       const saved = localStorage.getItem("ct_theme");
       if (saved) {
@@ -528,48 +663,20 @@
 
     function toggleTheme() {
       const current = document.body.dataset.theme || "light";
-      const next = current === "light" ? "dark" : "light";
+      const next = current === "light" ? "dark" : "dark"; // keep dark for charts
       document.body.dataset.theme = next;
       localStorage.setItem("ct_theme", next);
-      // TradingView widgets will stay in their initial theme,
-      // but page chrome updates without reload.
     }
 
-    // KEYBOARD SHORTCUT: "t" to toggle theme
+    // Keyboard shortcut for theme
     document.addEventListener("keydown", (e) => {
       if (e.key === "t" || e.key === "T") {
         toggleTheme();
       }
     });
 
-    // TRADINGVIEW WIDGETS (auto-refresh from TradingView side)
-    function makeWidget(containerId, symbol) {
-      new TradingView.widget({
-        "container_id": containerId,
-        "symbol": symbol,
-        "width": "100%",
-        "height": 360,
-        "interval": "D",
-        "timezone": "Etc/UTC",
-        "theme": document.body.dataset.theme === "dark" ? "dark" : "light",
-        "style": "1",
-        "locale": "en",
-        "hide_side_toolbar": false,
-        "allow_symbol_change": true,
-        "withdateranges": true
-      });
-    }
-
+    // Persist details state
     document.addEventListener("DOMContentLoaded", function() {
-      makeWidget("tv_usdjpy", "FX_IDC:USDJPY");
-      makeWidget("tv_jp10y",  "TVC:JP10Y");
-      makeWidget("tv_vix",    "CBOE:VIX");
-      makeWidget("tv_dxy",    "TVC:DXY");
-      makeWidget("tv_hyg",    "AMEX:HYG");
-      makeWidget("tv_arkk",   "AMEX:ARKK");
-      makeWidget("tv_iwm",    "AMEX:IWM");
-
-      // PERSISTENT DETAILS OPEN/CLOSED STATE
       document.querySelectorAll("details[data-key]").forEach((d) => {
         const key = "ct_details_" + d.getAttribute("data-key");
         const saved = localStorage.getItem(key);
@@ -581,7 +688,7 @@
       });
     });
 
-    // LIVE USD/JPY PRICE (approx, independent of TradingView stream)
+    // Live USD/JPY header quote
     async function updateJPY() {
       const priceEl = document.getElementById("price");
       try {
@@ -599,7 +706,7 @@
     updateJPY();
     setInterval(updateJPY, 30000);
 
-    // TIMESTAMP WITH LOCAL TIMEZONE
+    // Timestamp
     (function setTimestamp() {
       const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "local time";
       const now = new Date();
